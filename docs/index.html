@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>从0到1实现Transformer（教学版）</title>
+  <style>
+    :root { color-scheme: light; --bg:#fff; --surface:#fafafa; --border:#e4e4e7; --text:#18181b; --muted:#71717a; --mono:ui-monospace,SFMono-Regular,Menlo,monospace; --sans:ui-sans-serif,system-ui,-apple-system,sans-serif; }
+    @media (prefers-color-scheme: dark) { :root { color-scheme: dark; --bg:#09090b; --surface:#18181b; --border:#27272a; --text:#fafafa; --muted:#a1a1aa; } }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:var(--sans); background:var(--bg); color:var(--text); line-height:1.6; -webkit-font-smoothing:antialiased; }
+    .hero { min-height:42vh; display:flex; align-items:center; justify-content:center; padding:64px 24px 40px; background:linear-gradient(135deg,var(--surface),var(--bg)); }
+    h1 { font-family:var(--mono); font-size:clamp(28px,4.6vw,44px); letter-spacing:-.03em; margin:0; text-align:center; line-height:1.2; }
+    .wrap { max-width:760px; margin:0 auto; padding:0 24px 80px; }
+    p { color:var(--muted); }
+    code { font-family:var(--mono); font-size:.92em; }
+    .how { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; margin:28px 0 40px; }
+    .how h2, .steps h2 { font-family:var(--mono); font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:0 0 12px; }
+    ul { list-style:none; padding:0; margin:0; }
+    li { display:flex; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); font-family:var(--mono); font-size:14px; }
+    li span { color:var(--muted); min-width:2.2em; }
+    li.done { color:var(--muted); text-decoration:line-through; }
+    .foot { margin-top:48px; padding-top:20px; border-top:1px solid var(--border); color:var(--muted); font-size:13px; }
+    .foot a { color:var(--text); text-decoration:none; }
+  </style>
+</head>
+<body>
+  <section class="hero"><h1>从0到1实现Transformer（教学版）</h1></section>
+  <div class="wrap">
+    <p>从一句文本怎样变成张量开始，依次写出位置编码、注意力、编码器、解码器、训练和束搜索。每一步只交付一个函数，最后得到一套能跑通前向与训练的 Transformer。</p>
+    <div class="how">
+      <h2>How to run</h2>
+      <p><code>python scaffold.py</code></p>
+    </div>
+    <div class="steps"><h2>Steps</h2><ul><li class="done"><span>1.</span> build_token_to_id_vocab</li>
+          <li class="done"><span>2.</span> build_id_to_token_vocab</li>
+          <li class=""><span>3.</span> encode_sentence_to_ids</li>
+          <li class=""><span>4.</span> decode_ids_to_tokens</li>
+          <li class=""><span>5.</span> pad_id_sequence</li>
+          <li class=""><span>6.</span> stack_padded_sequences_to_batch</li>
+          <li class=""><span>7.</span> scale_embeddings_by_sqrt_d_model</li>
+          <li class=""><span>8.</span> compute_positional_div_term</li>
+          <li class=""><span>9.</span> build_position_index_column</li>
+          <li class=""><span>10.</span> fill_even_indices_with_sin</li>
+          <li class=""><span>11.</span> fill_odd_indices_with_cos</li>
+          <li class=""><span>12.</span> build_sinusoidal_positional_encoding</li>
+          <li class=""><span>13.</span> add_positional_encoding_to_embeddings</li>
+          <li class=""><span>14.</span> build_padding_mask</li>
+          <li class=""><span>15.</span> build_causal_mask</li>
+          <li class=""><span>16.</span> combine_padding_and_causal_masks</li>
+          <li class=""><span>17.</span> compute_raw_attention_scores</li>
+          <li class=""><span>18.</span> scale_attention_scores</li>
+          <li class=""><span>19.</span> mask_attention_scores_with_neg_inf</li>
+          <li class=""><span>20.</span> softmax_attention_weights</li>
+          <li class=""><span>21.</span> apply_attention_weights_to_values</li>
+          <li class=""><span>22.</span> scaled_dot_product_attention</li>
+          <li class=""><span>23.</span> split_last_dim_into_heads</li>
+          <li class=""><span>24.</span> transpose_heads_before_sequence</li>
+          <li class=""><span>25.</span> merge_heads_back_to_model_dim</li>
+          <li class=""><span>26.</span> apply_linear_projection</li>
+          <li class=""><span>27.</span> project_to_query_key_value</li>
+          <li class=""><span>28.</span> split_qkv_into_heads</li>
+          <li class=""><span>29.</span> multi_head_scaled_dot_product_attention</li>
+          <li class=""><span>30.</span> merge_heads_and_project_output</li>
+          <li class=""><span>31.</span> assemble_multi_head_attention_forward</li>
+          <li class=""><span>32.</span> apply_ffn_first_linear_and_relu</li>
+          <li class=""><span>33.</span> apply_ffn_second_linear</li>
+          <li class=""><span>34.</span> position_wise_feed_forward_network</li>
+          <li class=""><span>35.</span> compute_layer_norm_mean_and_variance</li>
+          <li class=""><span>36.</span> normalize_and_scale_with_gamma_beta</li>
+          <li class=""><span>37.</span> apply_residual_add_and_norm</li>
+          <li class=""><span>38.</span> apply_dropout_with_keep_mask</li>
+          <li class=""><span>39.</span> encoder_layer_self_attention_sublayer</li>
+          <li class=""><span>40.</span> encoder_layer_feed_forward_sublayer</li>
+          <li class=""><span>41.</span> assemble_encoder_layer</li>
+          <li class=""><span>42.</span> stack_encoder_layers</li>
+          <li class=""><span>43.</span> decoder_layer_masked_self_attention_sublayer</li>
+          <li class=""><span>44.</span> decoder_layer_cross_attention_sublayer</li>
+          <li class=""><span>45.</span> decoder_layer_feed_forward_sublayer</li>
+          <li class=""><span>46.</span> assemble_decoder_layer</li>
+          <li class=""><span>47.</span> stack_decoder_layers</li>
+          <li class=""><span>48.</span> apply_final_output_projection</li>
+          <li class=""><span>49.</span> tie_output_projection_to_token_embeddings</li>
+          <li class=""><span>50.</span> apply_log_softmax_over_vocab</li>
+          <li class=""><span>51.</span> run_transformer_forward</li>
+          <li class=""><span>52.</span> init_encoder_layer_parameters</li>
+          <li class=""><span>53.</span> init_decoder_layer_parameters</li>
+          <li class=""><span>54.</span> init_embedding_and_projection_parameters</li>
+          <li class=""><span>55.</span> collect_model_parameters_into_list</li>
+          <li class=""><span>56.</span> shift_targets_right_with_start_token</li>
+          <li class=""><span>57.</span> compute_noam_learning_rate</li>
+          <li class=""><span>58.</span> build_uniform_smoothing_distribution</li>
+          <li class=""><span>59.</span> set_confidence_on_gold_tokens</li>
+          <li class=""><span>60.</span> zero_pad_column_and_pad_token_rows</li>
+          <li class=""><span>61.</span> compute_label_smoothed_kl_loss</li>
+          <li class=""><span>62.</span> average_loss_over_non_pad_tokens</li>
+          <li class=""><span>63.</span> compute_token_accuracy_ignoring_pad</li>
+          <li class=""><span>64.</span> initialize_adam_optimizer_state</li>
+          <li class=""><span>65.</span> update_adam_first_moment</li>
+          <li class=""><span>66.</span> update_adam_second_moment</li>
+          <li class=""><span>67.</span> apply_adam_bias_correction</li>
+          <li class=""><span>68.</span> apply_adam_step_to_all_parameters</li>
+          <li class=""><span>69.</span> zero_all_parameter_gradients</li>
+          <li class=""><span>70.</span> compute_batch_training_loss</li>
+          <li class=""><span>71.</span> run_training_step_with_backprop</li>
+          <li class=""><span>72.</span> run_training_loop_for_steps</li>
+          <li class=""><span>73.</span> pick_next_token_by_argmax</li>
+          <li class=""><span>74.</span> compute_length_penalty</li>
+          <li class=""><span>75.</span> compute_candidate_scores</li>
+          <li class=""><span>76.</span> select_top_k_candidates</li>
+          <li class=""><span>77.</span> append_tokens_to_beam_sequences</li>
+          <li class=""><span>78.</span> mark_finished_beams</li>
+          <li class=""><span>79.</span> select_best_finished_beam</li></ul></div>
+    <p class="foot"><a href="https://codeky.online">codeky.online</a></p>
+  </div>
+</body>
+</html>
