@@ -6,10 +6,8 @@ Assembled from your step-by-step solutions.
 
 # Step 1 - build_token_to_id_vocab
 from __future__ import annotations
-
 import math
 from typing import Any, Optional
-
 import torch
 import torch.nn.functional as F
 
@@ -17,29 +15,32 @@ def build_token_to_id_vocab(
     sentences: list[str],
     specials: tuple[str, ...] = ('<pad>', '<bos>', '<eos>', '<unk>'),
 ) -> dict[str, int]:
-
-    # 在此处实现你的代码
     vocab = {}
-    for token in specials:
-        vocab[token] = len(vocab)
-    for sentence in sentences:
-        for token in sentence.split():
-            if token not in vocab:
-                vocab[token] = len(vocab)
+    # 特殊标记从0开始编号
+    for idx, token in enumerate(specials):
+        vocab[token] = idx
+    next_id = len(specials)
+    # 遍历所有句子，按空格切分token
+    for sent in sentences:
+        tokens = sent.split()
+        for tok in tokens:
+            # special里的token不重复加入
+            if tok not in vocab:
+                vocab[tok] = next_id
+                next_id += 1
     return vocab
-    raise NotImplementedError
 
 # Step 2 - build_id_to_token_vocab
+from __future__ import annotations
+
 import math
 from typing import Any, Optional
+
 import torch
 import torch.nn.functional as F
 
 def build_id_to_token_vocab(token_to_id: dict[str, int]) -> dict[int, str]:
-    id_to_token = {}
-    for token, idx in token_to_id.items():
-        id_to_token[idx] = token
-    return id_to_token
+    return {id: token for token, id in token_to_id.items()}
 
 # Step 3 - encode_sentence_to_ids (not yet solved)
 # TODO: implement
