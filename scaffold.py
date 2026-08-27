@@ -7,7 +7,7 @@ Uses functions defined in model.py.
 from model import *  # noqa: F401, F403
 
 def main():
-    print("loaded build_id_to_token_vocab from model.py")
+    print("loaded encode_sentence_to_ids from model.py")
 
 if __name__ == "__main__":
     main()
